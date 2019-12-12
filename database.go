@@ -333,3 +333,55 @@ func (d *Database) Set(document interface{}) (*DocumentMeta, error) {
 
 	return resp, err
 }
+
+// Index creates an index document in cloudant
+// See: https://cloud.ibm.com/docs/services/Cloudant/api?topic=cloudant-query#creating-an-index
+func (d *Database) Index(createIndexArgs *createIndex) (*CreateIndexResponse, error) {
+	createIndexDocument, err := json.Marshal(createIndexArgs)
+	if err != nil {
+		return nil, err
+	}
+
+	job, err := d.client.request("POST", fmt.Sprintf("%s/%s", d.URL.String(), "_index"), bytes.NewReader(createIndexDocument))
+	defer job.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = expectedReturnCodes(job, 200)
+	if err != nil {
+		return nil, err
+	}
+
+	indexResp := &CreateIndexResponse{}
+	err = json.NewDecoder(job.response.Body).Decode(indexResp)
+
+	return indexResp, err
+}
+
+// Find performs a document query in cloudant
+// See: https://cloud.ibm.com/docs/services/Cloudant/api?topic=cloudant-query#ibm-cloudant-query-parameters
+func (d *Database) Find(findArgs *find) (*FindResponse, error) {
+	findDocument, err := json.Marshal(findArgs)
+	if err != nil {
+		return nil, err
+	}
+
+	job, err := d.client.request("POST", fmt.Sprintf("%s/%s", d.URL.String(), "_find"), bytes.NewReader(findDocument))
+	defer job.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = expectedReturnCodes(job, 200)
+	if err != nil {
+		return nil, err
+	}
+
+	findResp := &FindResponse{}
+	err = json.NewDecoder(job.response.Body).Decode(findResp)
+
+	return findResp, err
+}

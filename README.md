@@ -275,3 +275,46 @@ for {
     }
 }
 ```
+
+### Using `Index` and `Query`
+
+```go
+// create a Cloudant client (max. request concurrency 5)
+client, err := cloudant.CreateClient("user123", "pa55w0rd01", "https://user123.cloudant.com", 5)
+db, err := client.GetOrCreate("my_database")
+```
+
+Inorder to perform a query (_find) you must define an index
+
+```go
+myIndex = cloudant.NewCreateIndex().
+    Fields([]string{"field1", "field2"}).
+    Name("MyNewIndex").
+    Type(cloudant.IndexTypeJson).
+    Build()
+_, err := db.Index(eventIndex)
+if err != nil {
+    fmt.Errorf("unable to create index: %v",  err)
+    return
+}
+```
+
+To perform you query you need to build a Find and submit
+
+```go
+myFind := cloudant.NewFind().
+    SetSelector("field1", "myfield").
+    SetSelector("field2", map[string]interface{}{"$gte": 100}).
+    AddSort(map[string]string{"field1": "asc"}).
+    AddSort(map[string]string{"field2": "asc"}).
+    Limit(100).
+    Build()
+find, err := db.Find(eventFind)
+if err != nil {
+    fmt.Errorf("unable to get documents: %v", err)
+    return
+}
+for index, doc := range find.Docs{
+    fmt.Println("doc %d: %v", index, doc)
+}
+```
