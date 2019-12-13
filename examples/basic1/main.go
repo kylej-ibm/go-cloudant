@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	cldt "github.com/cloudant-labs/go-cloudant"
+	cldt "github.com/kylej-ibm/go-cloudant"
 	"github.com/joho/godotenv"
 )
 

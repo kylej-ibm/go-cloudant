@@ -14,7 +14,7 @@ go get github.com/joho/godotenv
 ```
 
 ```
-go get github.com/cloudant-labs/go-cloudant
+go get github.com/kylej-ibm/go-cloudant
 ```
 
 Download the basic1 folder with contents to your go src directory.
